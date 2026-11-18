@@ -1,0 +1,38 @@
+-- Active: 1794952734137@@127.0.0.1@3306
+CREATE TABLE Alunos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Nome VARCHAR (100) NOT NULL,
+    Email VARCHAR (100) NOT NULL
+)
+
+CREATE TABLE log_alunos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Mensagem VARCHAR (100) NOT NULL,
+    data_e_hora VARCHAR (100) NOT NULL
+
+)
+
+CREATE TRIGGER registrar novo_aluno
+AFTER INSERT ON alunos
+BEGIN
+    INSERT INTO log_alunos (mensagem, id_alunos)
+    VALUES ("Aluno cadastrado", NEW.id);
+END;
+
+SELECT
+    log_alunos.id
+    log_alunos.mensagem
+    Alunos.nome
+    FROM log_alunos
+    INNER JOIN alunos ON log_alunos.id = Alunos.id;
+
+CREATE TRIGGER registrar_alteracao_nome
+AFTER UPDATE ON alunos
+FOR EACH ROW
+BEGIN
+    IF OLD.nome <> NEW.nome THEN
+        INSERT INTO auditoria_alunos
+        (nome_antigo, nome_novo, data_hora)
+        VALUES
+        (OLD.nome, NEW.nome, NOW());
+    END IF;    
